@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Painel Moderno + Discord + PIX</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #000000, #001f4d);
+      min-height: 100vh;
+      color: white;
+      display: flex;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 60px;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(16px);
+      z-index: 1000;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .logo img {
+      height: 40px;
+    }
+
+    .right-content {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .icon {
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+      transition: transform 0.2s ease, opacity 0.2s;
+      opacity: 0.9;
+    }
+
+    .icon:hover {
+      transform: scale(1.15);
+      opacity: 1;
+    }
+
+    .btn-entrar {
+      padding: 8px 18px;
+      background: radial-gradient(circle at top left, #60a5fa 0, #2563eb 45%, #1d4ed8 100%);
+      color: white;
+      font-weight: 600;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.6);
+      transition: background 0.25s ease, transform 0.12s ease, box-shadow 0.25s ease;
+    }
+
+    .btn-entrar:hover {
+      background: radial-gradient(circle at top left, #93c5fd 0, #2563eb 50%, #1d4ed8 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 18px 45px rgba(37, 99, 235, 0.75);
+    }
+
+    .btn-entrar:active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.9);
+    }
+
+    .sidebar {
+      width: 250px;
+      background: rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(10px);
+      padding-top: 70px;
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+      min-height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 900;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar a.menu-item {
+      text-decoration: none;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      transition: background 0.25s, transform 0.1s;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .sidebar a.menu-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateX(2px);
+    }
+
+    .menu-group {
+      padding: 12px 20px 6px;
+      font-weight: bold;
+      font-size: 13px;
+      color: #ccc;
+      text-transform: uppercase;
+      user-select: none;
+      letter-spacing: 0.07em;
+      opacity: 0.9;
+    }
+
+    main {
+      margin-left: 250px;
+      margin-top: 70px;
+      padding: 30px;
+      flex: 1;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+
+      main {
+        margin-left: 0;
+      }
+    }
+
+    /* MODAL GENÉRICO */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      background: radial-gradient(circle at top left, #4f46e5 0, #020617 45%, #020617 100%);
+      border-radius: 20px;
+      padding: 26px 26px 24px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 22px 60px rgba(0,0,0,0.9);
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      position: relative;
+      overflow: hidden;
+      animation: slideUp 0.22s ease-out;
+    }
+
+    .modal::before {
+      content: "";
+      position: absolute;
+      width: 420px;
+      height: 420px;
+      background: radial-gradient(circle, rgba(129,140,248,0.32), transparent 60%);
+      top: -180px;
+      right: -120px;
+      opacity: 0.7;
+      pointer-events: none;
+      filter: blur(2px);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .modal-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal-title i {
+      font-size: 1.4rem;
+    }
+
+    .modal-subtitle {
+      font-size: 0.9rem;
+      color: #e5e7eb;
+      opacity: 0.92;
+      margin-bottom: 18px;
+      line-height: 1.4;
+      position: relative;
+      z-index: 1;
+    }
+
+    .close-modal {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148,163,184,0.6);
+      color: #e5e7eb;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 999px;
+      transition: background 0.2s, transform 0.13s, border-color 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .close-modal:hover {
+      background: rgba(30, 64, 175, 0.9);
+      border-color: rgba(191,219,254,0.9);
+      transform: rotate(4deg);
+    }
+
+    /* LOGIN DISCORD - CONTEÚDO */
+    .login-layout {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 16px;
+      align-items: center;
+    }
+
+    @media (max-width: 540px) {
+      .login-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .discord-login-btn {
+      width: 100%;
+      border-radius: 12px;
+      border: none;
+      padding: 13px 18px;
+      font-weight: 600;
+      font-size: 0.96rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: linear-gradient(135deg, #5865F2, #4f46e5);
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 18px 45px rgba(37, 99, 235, 0.65);
+      transition: transform 0.1s ease-out, box-shadow 0.2s ease-out, background 0.2s;
+      position: relative;
+      z-index: 1;
+    }
+
+    .discord-login-btn:hover {
+      background: linear-gradient(135deg, #6875f5, #4338ca);
+      transform: translateY(-1px);
+      box-shadow: 0 22px 55px rgba(37, 99, 235, 0.8);
+    }
+
+    .discord-login-btn:active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow: 0 12px 30px rgba(15,23,42,0.95);
+    }
+
+    .discord-login-btn i {
+      font-size: 1.3rem;
+    }
+
+    .login-qr-box {
+      border-radius: 14px;
+      background: rgba(15,23,42,0.95);
+      border: 1px solid rgba(148,163,184,0.7);
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .login-qr-label {
+      font-size: 0.8rem;
+      color: #cbd5f5;
+      opacity: 0.9;
+    }
+
+    .login-qr-box img {
+      border-radius: 8px;
+      width: 160px;
+      height: 160px;
+      object-fit: contain;
+      background: #020617;
+    }
+
+    .modal-footer {
+      margin-top: 18px;
+      font-size: 0.75rem;
+      color: #cbd5f5;
+      opacity: 0.95;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+      align-items: center;
+    }
+
+    .badge-beta {
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: #e5e7eb;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 8px rgba(34,197,94,0.9);
+    }
+
+    /* ÁREA DO USUÁRIO */
+    .user-area {
+      display: none;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-balance {
+      padding: 6px 8px 6px 12px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(22, 163, 74, 0.2), rgba(21, 128, 61, 0.4));
+      border: 1px solid rgba(34, 197, 94, 0.85);
+      font-size: 0.82rem;
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      box-shadow: 0 10px 28px rgba(22,163,74,0.35);
+      gap: 8px;
+    }
+
+    .btn-add-balance {
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      border: 1px solid rgba(34, 197, 94, 0.9);
+      background: rgba(6,95,70,0.7);
+      color: #bbf7d0;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+
+    .btn-add-balance:hover {
+      background: rgba(22,163,74,0.95);
+      color: white;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 3px 6px 3px 4px;
+      border-radius: 999px;
+      background: radial-gradient(circle at top left, rgba(37, 99, 235, 0.5), rgba(15, 23, 42, 0.95));
+      border: 1px solid rgba(148, 163, 184, 0.75);
+      cursor: pointer;
+      position: relative;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.95);
+      min-width: 0;
+    }
+
+    .user-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      background-size: cover;
+      background-position: center;
+      background-color: #020617;
+      border: 1px solid rgba(148, 163, 184, 0.75);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .user-text {
+      display: flex;
+      flex-direction: column;
+      max-width: 150px;
+    }
+
+    .user-name {
+      font-size: 0.85rem;
+      max-width: 150px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-tagline {
+      font-size: 0.7rem;
+      opacity: 0.7;
+    }
+
+    .user-chevron {
+      font-size: 0.85rem;
+      opacity: 0.75;
+    }
+
+    .user-dropdown {
+      position: absolute;
+      top: 110%;
+      right: 0;
+      background: #020617;
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.65);
+      min-width: 190px;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.95);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 3000;
+    }
+
+    .user-dropdown.show {
+      display: flex;
+    }
+
+    .user-dropdown-item {
+      padding: 10px 12px;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: background 0.18s;
+    }
+
+    .user-dropdown-item i {
+      font-size: 1rem;
+    }
+
+    .user-dropdown-item:hover {
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    .user-dropdown-item.logout {
+      color: #f97373;
+    }
+
+    .user-dropdown-item.logout:hover {
+      background: rgba(127,29,29,0.35);
+    }
+
+    /* MODAL DEPÓSITO PIX */
+
+    .amount-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .amount-pill {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.7);
+      font-size: 0.82rem;
+      cursor: pointer;
+      background: rgba(15,23,42,0.8);
+      color: #e5e7eb;
+    }
+
+    .amount-pill.selected {
+      background: rgba(59,130,246,0.9);
+      border-color: rgba(191,219,254,0.95);
+    }
+
+    .deposit-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .deposit-row input {
+      flex: 1;
+      border-radius: 10px;
+      border: 1px solid rgba(148,163,184,0.7);
+      background: rgba(15,23,42,0.9);
+      color: #e5e7eb;
+      padding: 8px 10px;
+      font-size: 0.9rem;
+    }
+
+    .deposit-row input::placeholder {
+      color: #6b7280;
+    }
+
+    .btn-deposit {
+      width: 100%;
+      border-radius: 10px;
+      border: none;
+      padding: 10px 14px;
+      margin-top: 4px;
+      font-weight: 600;
+      font-size: 0.92rem;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 16px 40px rgba(22,163,74,0.7);
+    }
+
+    .btn-deposit:hover {
+      background: linear-gradient(135deg, #4ade80, #16a34a);
+    }
+
+    .deposit-result {
+      margin-top: 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(148,163,184,0.7);
+      background: rgba(15,23,42,0.9);
+      padding: 10px 10px 12px;
+      font-size: 0.82rem;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .deposit-result.show {
+      display: flex;
+    }
+
+    .deposit-result img {
+      width: 150px;
+      height: 150px;
+      object-fit: contain;
+      border-radius: 8px;
+      background: #020617;
+      align-self: center;
+    }
+
+    .pix-label {
+      font-size: 0.8rem;
+      color: #cbd5f5;
+    }
+
+    .pix-text {
+      border-radius: 8px;
+      border: 1px solid rgba(55,65,81,0.8);
+      background: #020617;
+      padding: 6px 8px;
+      max-height: 80px;
+      overflow: auto;
+      font-size: 0.78rem;
+      word-break: break-all;
+    }
+
+    .copy-btn {
+      margin-top: 4px;
+      align-self: flex-end;
+      padding: 4px 10px;
+      font-size: 0.78rem;
+      border-radius: 999px;
+      border: none;
+      background: rgba(59,130,246,0.9);
+      color: white;
+      cursor: pointer;
+    }
+
+    .copy-btn:hover {
+      background: rgba(37,99,235,0.95);
+    }
+
+    .error-text {
+      margin-top: 6px;
+      font-size: 0.8rem;
+      color: #fed7d7;
+    }
+
+    /* ANIMAÇÕES */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* HERO (CONTEÚDO PRINCIPAL) */
+
+    .hero-card {
+      background: rgba(15,23,42,0.9);
+      border-radius: 18px;
+      padding: 22px 20px;
+      border: 1px solid rgba(148,163,184,0.45);
+      box-shadow: 0 20px 50px rgba(15,23,42,0.9);
+      max-width: 560px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      background: radial-gradient(circle, rgba(37,99,235,0.45), transparent 70%);
+      top: -80px;
+      left: -60px;
+      opacity: 0.6;
+    }
+
+    .hero-title {
+      font-size: 1.4rem;
+      margin-bottom: 5px;
+      font-weight: 600;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-subtitle {
+      font-size: 0.9rem;
+      color: #d1d5db;
+      margin-bottom: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-pill-row {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 0.78rem;
+      margin-top: 8px;
+    }
+
+    .hero-pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(30,64,175,0.7);
+      border: 1px solid rgba(129,140,248,0.8);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+      <img src="https://dummyimage.com/160x40/000/fff&text=LOGO" alt="Logo" />
+    </div>
+
+    <div class="right-content">
+      <i class="bi bi-gift icon" title="Presente"></i>
+      <i class="bi bi-gear icon" title="Configurações"></i>
+
+      <!-- Ícone de câmera (só aparece depois do login via JS) -->
+      <i class="bi bi-camera-video icon" id="icon-camera" title="Segurança (scanner)" style="display:none;"></i>
+
+      <button class="btn-entrar" id="btn-entrar">ENTRAR</button>
+
+      <div class="user-area" id="user-area">
+        <div class="user-balance">
+          <span id="user-balance-amount">R$ 0,00</span>
+          <button class="btn-add-balance" id="btn-add-balance" title="Adicionar saldo">+</button>
+        </div>
+
+        <div class="user-info" id="user-info">
+          <div class="user-avatar" id="user-avatar"></div>
+
+          <div class="user-text">
+            <span class="user-name" id="user-name">Usuário</span>
+            <span class="user-tagline">Conectado via Discord</span>
+          </div>
+
+          <i class="bi bi-chevron-down user-chevron"></i>
+
+          <div class="user-dropdown" id="user-dropdown">
+            <div class="user-dropdown-item" id="btn-history">
+              <i class="bi bi-wallet2"></i>
+              <span>Histórico de saldo</span>
+            </div>
+            <div class="user-dropdown-item logout" id="btn-logout">
+              <i class="bi bi-box-arrow-right"></i>
+              <span>Sair</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <aside class="sidebar">
+    <div class="menu-group">Geral</div>
+    <a class="menu-item" href="#">
+      <i class="bi bi-speedometer2"></i>
+      <span>Dashboard</span>
+    </a>
+    <a class="menu-item" href="#">
+      <i class="bi bi-controller"></i>
+      <span>Jogos</span>
+    </a>
+    <a class="menu-item" href="#">
+      <i class="bi bi-cash-coin"></i>
+      <span>Depósitos</span>
+    </a>
+
+    <div class="menu-group">Conta</div>
+    <a class="menu-item" href="/seguranca">
+      <i class="bi bi-shield-lock"></i>
+      <span>Segurança</span>
+    </a>
+  </aside>
+
+  <main>
+    <div class="hero-card">
+      <div class="hero-title">Painel conectado ao Discord</div>
+      <div class="hero-subtitle">
+        Entre com sua conta do Discord, acompanhe seu saldo, faça depósitos via Pix e gerencie a
+        segurança da sua conta com QR Codes.
+      </div>
+      <div class="hero-pill-row">
+        <div class="hero-pill">Login via Discord</div>
+        <div class="hero-pill">Depósito Pix integrado</div>
+        <div class="hero-pill">Scanner de QR Code</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL LOGIN -->
+  <div class="modal-overlay" id="login-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="bi bi-discord"></i>
+          <span>Entrar com Discord</span>
+        </div>
+        <button class="close-modal" id="close-modal-login">&times;</button>
+      </div>
+
+      <p class="modal-subtitle">
+        Use sua conta do Discord para acessar o painel com segurança. Você pode clicar no botão
+        ou escanear o QR Code com o celular.
+      </p>
+
+      <div class="login-layout">
+        <button class="discord-login-btn" id="discord-login-btn">
+          <i class="bi bi-discord"></i>
+          <span>Continuar com Discord</span>
+        </button>
+
+        <div class="login-qr-box">
+          <span class="login-qr-label">Escaneie com o celular</span>
+          <img id="login-qr-img" alt="QR Code de login" />
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <span class="badge-beta">
+          <span class="badge-dot"></span>
+          Discord OAuth2
+        </span>
+        <span>Login rápido e seguro.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DEPÓSITO PIX -->
+  <div class="modal-overlay" id="deposit-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="bi bi-cash-coin"></i>
+          <span>Adicionar saldo via Pix</span>
+        </div>
+        <button class="close-modal" id="close-modal-deposit">&times;</button>
+      </div>
+
+      <p class="modal-subtitle">
+        Escolha um valor entre 1 e 50 ou informe um valor personalizado. Em seguida, será gerado
+        o QR Code e o Pix copia e cola para pagamento.
+      </p>
+
+      <div class="amount-grid">
+        <button class="amount-pill" data-amount="1">R$ 1,00</button>
+        <button class="amount-pill" data-amount="5">R$ 5,00</button>
+        <button class="amount-pill" data-amount="10">R$ 10,00</button>
+        <button class="amount-pill" data-amount="20">R$ 20,00</button>
+        <button class="amount-pill" data-amount="50">R$ 50,00</button>
+      </div>
+
+      <div class="deposit-row">
+        <input type="number" id="deposit-custom" placeholder="Valor personalizado (R$)" min="1" step="1">
+      </div>
+
+      <button class="btn-deposit" id="btn-create-deposit">Gerar Pix</button>
+      <div class="error-text" id="deposit-error"></div>
+
+      <div class="deposit-result" id="deposit-result">
+        <img id="deposit-qr-img" alt="QR Code Pix">
+        <div class="pix-label">Pix copia e cola:</div>
+        <div class="pix-text" id="pix-text"></div>
+        <button class="copy-btn" id="btn-copy-pix">Copiar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const btnEntrar       = document.getElementById('btn-entrar');
+    const loginModal      = document.getElementById('login-modal');
+    const closeLoginModal = document.getElementById('close-modal-login');
+    const discordLoginBtn = document.getElementById('discord-login-btn');
+    const loginQrImg      = document.getElementById('login-qr-img');
+    const iconCamera      = document.getElementById('icon-camera');
+
+    const userArea        = document.getElementById('user-area');
+    const userNameEl      = document.getElementById('user-name');
+    const userAvatarEl    = document.getElementById('user-avatar');
+    const userBalanceEl   = document.getElementById('user-balance-amount');
+    const userInfoEl      = document.getElementById('user-info');
+    const userDropdown    = document.getElementById('user-dropdown');
+    const btnLogout       = document.getElementById('btn-logout');
+    const btnHistory      = document.getElementById('btn-history');
+
+    const btnAddBalance   = document.getElementById('btn-add-balance');
+    const depositModal    = document.getElementById('deposit-modal');
+    const closeDeposit    = document.getElementById('close-modal-deposit');
+    const amountPills     = document.querySelectorAll('.amount-pill');
+    const customInput     = document.getElementById('deposit-custom');
+    const btnCreateDeposit= document.getElementById('btn-create-deposit');
+    const depositError    = document.getElementById('deposit-error');
+    const depositResult   = document.getElementById('deposit-result');
+    const depositQrImg    = document.getElementById('deposit-qr-img');
+    const pixTextEl       = document.getElementById('pix-text');
+    const btnCopyPix      = document.getElementById('btn-copy-pix');
+
+    let selectedAmount = null;
+
+    // ===== LOGIN MODAL =====
+    btnEntrar.addEventListener('click', () => {
+      loginModal.classList.add('show');
+    });
+
+    closeLoginModal.addEventListener('click', () => {
+      loginModal.classList.remove('show');
+    });
+
+    loginModal.addEventListener('click', (e) => {
+      if (e.target === loginModal) {
+        loginModal.classList.remove('show');
+      }
+    });
+
+    discordLoginBtn.addEventListener('click', () => {
+      window.location.href = '/auth/discord';
+    });
+
+    // QR de login apontando pra /auth/discord
+    (function gerarLoginQR() {
+      const url = window.location.origin + '/auth/discord';
+      const src = 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' + encodeURIComponent(url);
+      loginQrImg.src = src;
+    })();
+
+    // Clique no ícone de câmera vai para /seguranca
+    if (iconCamera) {
+      iconCamera.addEventListener('click', () => {
+        window.location.href = '/seguranca';
+      });
+    }
+
+    // ===== CARREGAR USUÁRIO LOGADO =====
+    function aplicarUsuario(user) {
+      btnEntrar.style.display = 'none';
+      userArea.style.display  = 'flex';
+      if (iconCamera) iconCamera.style.display = 'inline-block';
+
+      userNameEl.textContent = user.username;
+      userBalanceEl.textContent = 'R$ ' + user.balance.toFixed(2).replace('.', ',');
+
+      if (user.avatarUrl) {
+        userAvatarEl.style.backgroundImage = `url(${user.avatarUrl})`;
+        userAvatarEl.textContent = '';
+      } else {
+        userAvatarEl.style.backgroundImage = 'none';
+        userAvatarEl.textContent = user.username[0]?.toUpperCase() || 'U';
+      }
+    }
+
+    async function carregarUsuario() {
+      try {
+        const res = await fetch('/api/me');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.loggedIn && data.user) {
+          aplicarUsuario(data.user);
+        }
+      } catch (err) {
+        console.error('Erro ao carregar usuário:', err);
+      }
+    }
+
+    // ===== DROPDOWN USUÁRIO =====
+    userInfoEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      userDropdown.classList.toggle('show');
+    });
+
+    document.addEventListener('click', () => {
+      userDropdown.classList.remove('show');
+    });
+
+    userDropdown.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+
+    btnHistory.addEventListener('click', () => {
+      window.location.href = '/saldo/historico';
+    });
+
+    btnLogout.addEventListener('click', async () => {
+      try {
+        await fetch('/api/logout', { method: 'POST' });
+      } catch (e) {}
+      window.location.href = '/';
+    });
+
+    // ===== MODAL DEPÓSITO =====
+    btnAddBalance.addEventListener('click', () => {
+      depositError.textContent = '';
+      depositResult.classList.remove('show');
+      selectedAmount = null;
+      customInput.value = '';
+      amountPills.forEach(p => p.classList.remove('selected'));
+      depositModal.classList.add('show');
+    });
+
+    closeDeposit.addEventListener('click', () => {
+      depositModal.classList.remove('show');
+    });
+
+    depositModal.addEventListener('click', (e) => {
+      if (e.target === depositModal) {
+        depositModal.classList.remove('show');
+      }
+    });
+
+    amountPills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        amountPills.forEach(p => p.classList.remove('selected'));
+        pill.classList.add('selected');
+        selectedAmount = Number(pill.dataset.amount);
+        customInput.value = '';
+        depositError.textContent = '';
+        depositResult.classList.remove('show');
+      });
+    });
+
+    customInput.addEventListener('input', () => {
+      if (customInput.value) {
+        amountPills.forEach(p => p.classList.remove('selected'));
+        selectedAmount = Number(customInput.value);
+      } else {
+        selectedAmount = null;
+      }
+      depositError.textContent = '';
+      depositResult.classList.remove('show');
+    });
+
+    btnCreateDeposit.addEventListener('click', async () => {
+      depositError.textContent = '';
+      depositResult.classList.remove('show');
+
+      if (!selectedAmount || selectedAmount < 1) {
+        depositError.textContent = 'Informe um valor válido (mínimo R$ 1,00).';
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/deposit/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount: selectedAmount })
+        });
+
+        if (res.status === 401) {
+          depositError.textContent = 'Faça login com o Discord antes de depositar.';
+          return;
+        }
+
+        if (!res.ok) {
+          depositError.textContent = 'Erro ao gerar pagamento Pix. Tente novamente.';
+          return;
+        }
+
+        const data = await res.json();
+
+        if (!data.qrCode || !data.qrCodeBase64) {
+          depositError.textContent = 'Resposta inválida do servidor.';
+          return;
+        }
+
+        depositQrImg.src = 'data:image/png;base64,' + data.qrCodeBase64;
+        pixTextEl.textContent = data.qrCode;
+        depositResult.classList.add('show');
+      } catch (err) {
+        console.error('Erro ao criar depósito:', err);
+        depositError.textContent = 'Erro inesperado. Tente novamente.';
+      }
+    });
+
+    btnCopyPix.addEventListener('click', async () => {
+      const text = pixTextEl.textContent || '';
+      if (!text) return;
+      try {
+        await navigator.clipboard.writeText(text);
+        btnCopyPix.textContent = 'Copiado!';
+        setTimeout(() => btnCopyPix.textContent = 'Copiar', 1500);
+      } catch (err) {
+        console.error('Erro ao copiar Pix:', err);
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', carregarUsuario);
+  </script>
+</body>
+</html>
