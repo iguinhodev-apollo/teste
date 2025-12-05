@@ -11,7 +11,7 @@ const app = express();
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
 const DISCORD_REDIRECT_URI =
-  process.env.DISCORD_REDIRECT_URI || 'http://localhost:3000/auth/discord/callback';
+  process.env.DISCORD_REDIRECT_URI || 'https://devhostings.online/auth/discord/callback';
 const SESSION_SECRET = process.env.SESSION_SECRET;
 const MP_ACCESS_TOKEN = process.env.MERCADO_PAGO_ACCESS_TOKEN;
 
